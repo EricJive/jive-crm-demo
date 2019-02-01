@@ -1,0 +1,161 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 30vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 35vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link, p {
+  color: #61dafb;
+  font-size: 25px;
+}
+
+a {
+  color: #61dafb;
+  text-decoration: none;
+}
+
+h3 , .home {
+  background-color: #282c34;
+  color: #61dafb;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  margin: 4px 2px;
+  border: none;
+}
+
+ul {
+  background-color: #282c34;
+  color: #61dafb;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 25px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border: none;
+  list-style-type: none;
+}
+
+.link, button, option, select, .loggedin {
+  background-color: #282c34;
+  color: #61dafb;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border: none;
+}
+
+.links {
+  display: inline-block;
+  margin: 4px 2px;
+  text-align: center;
+}
+
+.divider{
+  width:30px;
+  height:auto;
+  display:inline-block;
+}
+
+.clicktocall , .clicktocall2 {
+  background-color: #282c34;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  border: none;
+  height: 64px;
+  width: 64px;
+}
+
+.jive, .contact, .test, .settings  {
+    background-color: #282c34;
+    color: #61dafb;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin: 4px 2px;
+    border: none;
+    min-height: 80vh;
+}
+
+.callbtn {
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  margin: none;
+  height: 64px;
+  width: 64px;
+}
+
+.main  {
+  background-color: #282c34;
+  min-height: 80vh;
+}
+
+.call  {
+  background-image: url(./yescall.png);
+  display: block;
+  background-color: #282c34;
+  background-size: cover;
+  background-position: center;
+  border: none;
+  margin: none;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -ms-background-size: cover;
+  -o-background-size: cover;
+  height: 64px;
+  width: 64px;
+
+}
+
+.nocall {
+  background-image: url(./nocall.png);
+  display: block;
+  background-color: #282c34;
+  background-size: cover;
+  background-position: center;
+  border: none;
+  margin: none;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -ms-background-size: cover;
+  -o-background-size: cover;
+  height: 64px;
+  width: 64px;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+

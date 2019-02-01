@@ -1,0 +1,22 @@
+{
+    "contacts":[
+        {
+            "contactId": 0,
+            "firstname": "Ben",
+            "lastname": "Solo",
+            "phone": "801-373-9120"
+        },
+        {
+            "contactId": 2,
+            "firstname": "John",
+            "lastname": "Smith",
+            "phone": "385-440-0115"
+        },
+        {
+            "contactId": 3,
+            "firstname": "Sally",
+            "lastname": "Jones",
+            "phone": "877-548-3003"
+        }
+
+]}
