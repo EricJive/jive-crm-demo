@@ -17,7 +17,6 @@ class MyWindowPortal extends React.PureComponent {
       if (!localStorage.getItem('token')) {
 
         this.externalWindow = window.open('https://auth.jive.com/oauth2/v2/grant?response_type=token&client_id=f70359a9-cb00-401d-9ad2-b1fa89657a69&redirect_uri=http://67.207.41.150/jiveauth.php&scope=users.v1.lines.read calls.v2.initiate','window','toolbar=no,menubar=no,resizable=no,height=550,location=no,width=400');
-        //this.externalWindow = window.open('http://localhost:3000/jiveauth.php#access_token=eyJhbGciOiJIUzUxMiJ9.eyJzY3AiOiJjYWxscy52Mi5pbml0aWF0ZSB1c2Vycy52MS5saW5lcy5yZWFkIiwic3ViIjoic2hpZWxkc2VyaWMyNUBnbWFpbC5jb20iLCJpc3MiOiJkZWZhdWx0IiwidHlwIjoiYWNjZXNzIiwiZ250IjoiOGZiOWFmNjUtZDYzNC00Y2MwLWIwZGMtZWUzNDZjMDVhNjlkIiwiZXhwIjoxNTUxMDU1NTQ4LCJqdGkiOiIxMzEzOTlhYi05MTQzLTQ1MjktOWU0Yy1hNGRiODg1YTUzODQiLCJjaWQiOiJmNzAzNTlhOS1jYjAwLTQwMWQtOWFkMi1iMWZhODk2NTdhNjkifQ.oE41atZM6rGSINvnLkoIFZognIXRZMhFdFB20ZqqxQ6V-Sr2XJ5IKLI6wgHZ9_GWkRsHijIlp2Eu7REmxOi75w&type=bearer&expires_in=2592000000&username=shieldseric25@gmail.com','window','toolbar=no,menubar=no,resizable=no,height=550,location=no,width=400');
         this.externalWindow.document.body.appendChild(this.containerEl);
       }
 
