@@ -1,35 +1,29 @@
-.App {
-  text-align: center;
+.mainapp .App {
+  min-height: 100vh;
+  color:  #61dafb;
 }
 
 .App-logo {
-  height: 30vmin;
+  height: 25vmin;
+
 }
 
-.App-header {
-  background-color: #282c34;
+.App-header  {
   min-height: 35vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link, p {
-  color: #61dafb;
   font-size: 25px;
 }
 
 a {
-  color: #61dafb;
   text-decoration: none;
+  color:  #61dafb;
 }
 
 h3 , .home {
-  background-color: #282c34;
-  color: #61dafb;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
@@ -40,21 +34,17 @@ h3 , .home {
 }
 
 ul {
-  background-color: #282c34;
-  color: #61dafb;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
   font-size: 25px;
   margin: 4px 2px;
-  cursor: pointer;
   border: none;
   list-style-type: none;
 }
 
-.link, button, option, select, .loggedin {
+.link, button, option, select, .loggedin, .login {
   background-color: #282c34;
-  color: #61dafb;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
@@ -63,6 +53,32 @@ ul {
   margin: 4px 2px;
   cursor: pointer;
   border: none;
+  height: 100%;
+  color:  #61dafb;
+}
+
+.callpop {
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  margin: 4px 2px;
+  border: none;
+  height: 100%;
+}
+
+.pop {
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 25px;
+  margin: 4px 2px;
+}
+
+.callInfo {
+
+  text-align: left;
 }
 
 .links {
@@ -77,85 +93,157 @@ ul {
   display:inline-block;
 }
 
-.clicktocall , .clicktocall2 {
-  background-color: #282c34;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  margin: 4px 2px;
+.clicktocall  {
+  justify-content:center;
+  align-items:center;
   border: none;
-  height: 64px;
-  width: 64px;
+  display: block;
+  min-height:10vh
 }
 
-.jive, .contact, .test, .settings  {
-    background-color: #282c34;
-    color: #61dafb;
-    padding: 15px 32px;
+.jive, .contact, .test, .settings , .allContacts, .websocket  {
+    padding: 15px 32px; 
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 25px;
     margin: 4px 2px;
     border: none;
-    min-height: 80vh;
+    height: 100%;
+}
+
+.callbox {
+  padding: 10px;
+ 
+  float:right;
+  height: 100px;
 }
 
 .callbtn {
-  text-align: center;
   cursor: pointer;
   border: none;
   margin: none;
-  height: 64px;
-  width: 64px;
+  display: flex;
+  justify-content:center;
+  align-items:center;
 }
 
 .main  {
   background-color: #282c34;
-  min-height: 80vh;
+  height: 100%;
+  text-align: center;
+}
+
+.closePop  {
+  background-image: url(./close.png);
+  float: left;
+  display: block;
+  background-size: cover;
+  background-position: center;
+  border: none;
+  margin: none;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -ms-background-size: cover;
+  -o-background-size: cover;
+  height: 32px;
+  width: 32px;
+
 }
 
 .call  {
   background-image: url(./yescall.png);
   display: block;
-  background-color: #282c34;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   border: none;
   margin: none;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -ms-background-size: cover;
-  -o-background-size: cover;
-  height: 64px;
-  width: 64px;
-
+  -webkit-background-size: contain;
+  -moz-background-size: contain;
+  -ms-background-size: contain;
+  -o-background-size: contain;
 }
 
 .nocall {
   background-image: url(./nocall.png);
   display: block;
-  background-color: #282c34;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   border: none;
   margin: none;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -ms-background-size: cover;
-  -o-background-size: cover;
-  height: 64px;
-  width: 64px;
+  -webkit-background-size: contain;
+  -moz-background-size: contain;
+  -ms-background-size: contain;
+  -o-background-size: contain;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.ReactModalPortal {
+  height: 40%;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 50vh;
+  background-color : #f5f5f5;
+  color: black !important;
+}
+.slide-pane {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  min-width: 100px;
+  height: 100%;
+  box-shadow: 0 8px 8px rgba(0,0,0,0.5);
+  transition: transform 0.5s;
+  will-change: transform;
 }
 
+.slide-pane__overlay {
+  height: 40%;
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 50vh;
+
+}
+
+.slide-pane_from_bottom {
+  height: 100%;
+  transform: translateY(100%);
+}
+
+.slide-pane_from_bottom.ReactModal__Content--after-open {
+  transform: translateY(0%);
+}
+.slide-pane_from_bottom.ReactModal__Content--before-close {
+  transform: translateY(100%);
+}
+
+.slide-pane__close {
+  width: 12px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.slide-pane__header {
+  background-color: rgb(153, 150, 150);
+}
+
+.left {
+  float:left;
+  display: flex;
+  justify-content:center;
+  align-items:center;
+  height: 100%;
+}
+
+.right {
+  float:right;
+  display: flex;
+  justify-content:center;
+  align-items:center;
+  height: 100%;
+}
 
