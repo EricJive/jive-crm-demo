@@ -158,6 +158,7 @@ class LineSelect extends React.Component {
 
                 localStorage.setItem('ws', data.ws);
                 localStorage.setItem('subscriptions', data.subscriptions);
+                localStorage.setItem('session', data.self);
                 console.log('Session info saved');
     
             })

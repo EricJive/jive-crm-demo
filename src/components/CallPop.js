@@ -9,7 +9,9 @@ class CallPop extends React.Component {
         super(props);
         this.state = {
             isPaneOpen: false,
-            callComplete: false
+            callComplete: false,
+            callStarted: false,
+            callCount: 0
         };
 
         this.interval = null;
@@ -25,7 +27,7 @@ class CallPop extends React.Component {
         console.log('CallPop interval running')
 
         if (this.props.callEnded) {
-            this.setState({callComplete: true})
+            this.setState({callComplete: true, callStarted: false})
             clearInterval(this.interval);
         }
 
@@ -38,10 +40,14 @@ class CallPop extends React.Component {
 
         // Panel is still open, need to clear data or make a new pop
         if (this.state.isPaneOpen){
+            console.log('Pane is open already')
+            this.setState({isPaneOpen : true}, function() {
+                this.props.clearPop();
+            })
+        }        
 
-        }
+        this.setState({ isPaneOpen: true, callStarted: true , callComplete: false, callCount: this.state.callCount + 1});
 
-        this.setState({ isPaneOpen: true });
 
         this.interval = setInterval(
 
@@ -56,13 +62,15 @@ class CallPop extends React.Component {
             this.props.clearPop();
         });
 
-        this.setState({callComplete: false})
+        this.setState({callComplete: false, callCount: 0})
 
         clearInterval(this.interval);
         
     }
 
     render() {
+
+        console.log('Call pop rendered and calldata:' + this.props.callData)
 
         return (
             <div ref={ref => this.el = ref}>
@@ -76,7 +84,7 @@ class CallPop extends React.Component {
                 onRequestClose={ () => 
                     this.closePane()
                 }>
-                <div className='callInfo'>{this.props.callData} <Counter callEnded={this.state.callComplete}></Counter></div>
+                <div className='callInfo'>{this.props.callData} <Counter  key={this.state.callCount} callEnded={this.state.callComplete} callStarted={this.state.callStarted}></Counter></div>
             </SlidingPane>
         </div>
         )

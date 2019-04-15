@@ -16,7 +16,6 @@ class MyWindowPortal extends React.PureComponent {
 
       this.externalWindow.document.body.appendChild(this.containerEl);
       
-      
     };
   
     componentWillUnmount() {

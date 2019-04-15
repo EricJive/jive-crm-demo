@@ -7,8 +7,7 @@ class MessageParser extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-    
-            newMessage: '',
+
             frames: [],
             keepalivesCount: 0,
             callEnded: false
@@ -33,9 +32,14 @@ class MessageParser extends React.PureComponent {
 
     clearFrames(){
 
-        this.setState(
-            {frames: []}
+        console.log('Clear frames called');
+
+        this.setState({frames: [] }, function () {
+
+                console.log('Frames cleared');
+            }
         );
+        
     }
 
     processSocketMessage(result, currentTime, timestamp){
@@ -116,10 +120,14 @@ class MessageParser extends React.PureComponent {
                 break;
 
             case "withdraw":
+
+                console.log('Withdraw hit');
                 ///Hande Call End
                 this.setState({callEnded: true}, function (){
-                    message = 'Call ended @ ' + timestamp;
+                    console.log('callEnded state set to true')
+                    
                 });
+                message = 'Call ended @ ' + timestamp;
                 break;
 
             case 'keepalive':
@@ -137,29 +145,20 @@ class MessageParser extends React.PureComponent {
     }
 
    
-    handleData(data) {
+    handleData() {
+
+        console.log('Message parser handling data');
 
         var date = new Date();
         var unixtimestamp = date.getTime();
 
         var timestamp = this.timeConverter(unixtimestamp);
 
-        // Socket has been replied to at least once
-        if (this.state.frames.length === 1 ){
-
-            localStorage.setItem('socketOpen', true);
-
-            if (!localStorage.getItem('multipleLines')) {
-
-                this.subscribeLine();
-            }
-            
-        }
-
-        let result = JSON.parse(data);
+        let result = JSON.parse(this.props.newMessage);
         var message = '';
 
         message = this.processSocketMessage(result,unixtimestamp,timestamp);
+        console.log('Message is ' + message)
 
         //Discard message
         if(message === '') {
@@ -173,7 +172,6 @@ class MessageParser extends React.PureComponent {
                 {frames: [...this.state.frames , message]}
             );
 
-            
 
             if (this.state.frames.length > 10) {
                 
@@ -195,9 +193,10 @@ class MessageParser extends React.PureComponent {
         console.log('MessageParser Component Moutned');
     };
 
-    
   
     render() {
+
+        console.log('MessageParser rendered');
 
         var list = this.state.frames.map((item) =>
 

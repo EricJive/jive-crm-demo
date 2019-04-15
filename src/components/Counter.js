@@ -5,9 +5,8 @@ class Counter extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            date: new Date(),
             timer: 0,
-            totalTime: 0
+            counterActive: false
         };
 
         this.interval = null;
@@ -19,9 +18,9 @@ class Counter extends React.Component {
 
     setTimer(){
 
-        console.log('setTimer hit')
+        console.log('setTimer hit');
 
-        this.setState({timer: 0});
+        this.setState({counterActive: true});
 
         this.interval = setInterval(
 
@@ -51,15 +50,6 @@ class Counter extends React.Component {
     stopTimer(){
 
         clearInterval(this.interval);
-
-        this.setState({totalTime: this.state.timer}, function (){
-
-            this.setState({timer: 0});
-        });
-
-
-        this.setTimer();
-
     }
 
     componentWillUnmount() {
@@ -75,20 +65,9 @@ class Counter extends React.Component {
 
     render() {
 
-        if (this.state.totalTime > 0){
-
-            return (
-                <div>Call Length: {this.toHHMMSS(this.state.totalTime)}</div>
-            )
-            
-        }
-
-        else {
-
-            return (
-                <div>Call Length: {this.toHHMMSS(this.state.timer)}</div>
-            )
-        }
+        return (
+            <div>Call Length: {this.toHHMMSS(this.state.timer)}</div>
+        )
         
     }
 }

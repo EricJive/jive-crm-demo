@@ -1,7 +1,6 @@
 import React from 'react';
 import Websocket from 'react-websocket';
 import axios from 'axios';
-import CallPop from './CallPop';
 import MessageParser from './MessageParser';
 
 
@@ -10,133 +9,14 @@ class WebSock extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-          frames: [],
-          keepalivesCount: 0,
+
           showSocket: false,
-          callEnded: false
+          currentMessage: '',
+          lineSubscribed: false
         };
 
         this.timer = null;
-        this.clearFrames = this.clearFrames.bind(this);
-    }
-
-    timeConverter(UNIX_timestamp){
-
-        var a = new Date(UNIX_timestamp);
-        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        var year = a.getFullYear();
-        var month = months[a.getMonth()];
-        var date = a.getDate();
-        var hour = a.getHours();
-        var min =  '0' + a.getMinutes();
-        var sec = '0' + a.getSeconds();
-        var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min.substr(-2) + ':' + sec.substr(-2) ;
-        return time;
-      }
-
-    clearFrames(){
-
-        this.setState(
-            {frames: []}
-        );
-    }
-
-    processSocketMessage(result, currentTime, timestamp){
-
-        var message = '';
-        var timeOfMessage;
-        var callerID;
-
-        if (result.data) {
-            callerID = result.data.display;
-            timeOfMessage = result.data.created;
-        }
-    
-        switch (result.type) {
-
-            case "announce":
-                if (timeOfMessage && ((currentTime - 100000) < timeOfMessage)) {
-
-                    // Call data already exists 
-                    if(this.state.frames.length > 0) {
-
-                        this.clearFrames();
-                    } 
-
-                    this.setState({callEnded: false});
-
-                    this.popref.openPane();
-                    
-                    //Handle New Call Announcement
-                    if (result.data.direction === 'recipient') {
-
-                        message = "New call incoming from " + callerID + ' @ ' + timestamp;
-                    }
-
-                    else {
-                        message = "Calling out to " + callerID+ ' started @ ' + timestamp;
-                    }
-                }
-
-                break;
-
-            case "replace":
-                    
-                //Handle replace message 
-                var callState = result.data.state;
-                
-                switch (callState) {
-                    // the call represented by this state snapshot is initialized
-                    case 'trying':
-                        //Inbound
-                        if (result.data.direction === 'recipient') {
-                            message = 'Call incoming from ' + callerID + ' is trying to connect';
-                        }
-                        //Outbound
-                        else {
-                            message = 'Call out to ' + callerID + ' is trying to connect';
-                        }
-                        
-                        break;
-
-                    //the call represented by this state snapshot is ringing
-                    case 'early':
-                        message = 'Call is ringing';
-                        
-                        break;
-
-                    //the call represented by this state snapshot is answered / connected
-                    case 'confirmed':
-                        message = "Call Connected @ " + timestamp;
-                        break;
-
-                    //No match
-                    default:
-                        message = 'An error occurred';
-                         break;
-                    }
-
-                break;
-
-            case "withdraw":
-                ///Hande Call End
-                this.setState({callEnded: true}, function (){
-                    message = 'Call ended @ ' + timestamp;
-                });
-                break;
-
-            case 'keepalive':
-                //keep alive
-                message = 'keep alive received';
-                break;
-
-            default:
-                console.log('An error occurred');
-                message = '';
-                break;
-        }
-        
-        return message;
+        this.keepAliveTimer= null;
     }
 
     subscribeLine() {
@@ -147,92 +27,129 @@ class WebSock extends React.PureComponent {
         var accountID = localStorage.getItem('organizationID');
         var ext = localStorage.getItem('selectedLine');
 
-        console.log('Attempting to subscribe to line ' + lineID);
+        if (lineID) {
+
+            console.log('Attempting to subscribe to line ' + lineID);
+
+            var headers = {
+
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            };
+
+            var reqBody = JSON.stringify(
+                [
+                    {
+                        id : ext,
+                        type: "dialog",
+                        entity : {
+                            id : lineID,
+                            type: "line",
+                            account: accountID
+                        }
+                    }
+                ]
+            )
+
+            axios.post(url,reqBody,{headers: headers})
+            .then(response => {
+                console.log(response.data);
+                this.setState({lineSubscribed: true})
+            })
+        }
+    }
+
+    getSession() {
+
+        console.log('Getting session info...');
+
+        var token = localStorage.getItem('token');
 
         var headers = {
-
-            "Content-Type": "application/json",
             "Authorization": "Bearer " + token
         };
 
-        var reqBody = JSON.stringify(
-            [
-                {
-                    id : ext,
-                    type: "dialog",
-                    entity : {
-                        id : lineID,
-                        type: "line",
-                        account: accountID
-                    }
-                }
-            ]
-        )
+        return axios.post('https://realtime.jive.com/v2/session',null,{headers: headers})
+        .then(response => { 
+            console.log(response)
+            return response.data;
+          })
+          
+        .catch(error => {
+            console.log(error);
+            alert("An error occurred, Session request failed. Please try again later or logout from Jive");
+            return error.response.status;
+        });
+    }
 
-        axios.post(url,reqBody,{headers: headers})
-        .then(response => console.log(response.data));
+    checkSubscription() {
+
+        console.log('Checking subscription info...');
+
+        var token = localStorage.getItem('token');
+
+        var url = localStorage.getItem('session');
+
+        var headers = {
+            "Authorization": "Bearer " + token
+        };
+
+        return axios.get(url,{headers: headers})
+        .then(response => { 
+            console.log(response)
+            return response.data;
+          })
+          
+        .catch(error => {
+            console.log(error);
+            alert("An error occurred, Session info request failed. Please try again later or logout from Jive");
+            return error.response.status;
+        });
     }
 
     handleData(data) {
 
-        var date = new Date();
-        var unixtimestamp = date.getTime();
+        // Stop 30 second timer when frame comes in
 
-        var timestamp = this.timeConverter(unixtimestamp);
+        clearInterval(this.keepAliveTimer);
 
-        // Socket has been replied to at least once
-        if (this.state.frames.length === 1 ){
+        this.setState({currentMessage: data}, function (){
+            this.mpref.handleData();
 
-            localStorage.setItem('socketOpen', true);
-
-            if (!localStorage.getItem('multipleLines')) {
-
-                this.subscribeLine();
-            }
-            
-        }
-
-        let result = JSON.parse(data);
-        var message = '';
-
-        message = this.processSocketMessage(result,unixtimestamp,timestamp);
-
-        //Discard message
-        if(message === '') {
-            console.log('Socket message discarded');
-        }
-
-        //Keep the message
-        else if (message !== 'keep alive received'){
-            
-            this.setState(
-                {frames: [...this.state.frames , message]}
+            //start 30 second timerAGAIN after getting frame from socket
+            console.log('Timer reset');
+            this.keepAliveTimer = setInterval(
+                () => this.checkForFrames(), 35000
             );
-
             
-
-            if (this.state.frames.length > 10) {
-                
-                this.clearFrames();
-            }
-        }
-
-        //Keep alive
-        else {
-            this.setState(
-                {keepalivesCount: this.state.keepalivesCount + 1}
-            );
-        }
-        
+        });
     }
 
     reconnect() {
-        //TODO
-        //Clear the subscription info
-        //Create new subscription
 
+        console.log('Reconnect function called');
+
+        //Clear the current subscription info
         localStorage.removeItem('ws');
         localStorage.removeItem('subscrtiptions');
+
+        //this.checkSubscription().then(response => {
+
+          //  console.log(response.activeSubscriptions);
+        //});
+
+        //Create new session
+        this.getSession().then(data =>{
+
+            localStorage.setItem('ws', data.ws);
+            localStorage.setItem('subscriptions', data.subscriptions);
+            localStorage.setItem('session', data.self);
+            console.log('Session info saved');
+
+        })
+
+        //Create new subscription
+        this.subscribeLine();
 
     }
   
@@ -245,15 +162,33 @@ class WebSock extends React.PureComponent {
         }
     }
 
+    checkForFrames() {
+
+        console.log('No frames for 35 seconds, requesting new session');
+        this.reconnect()
+
+    }
+
     toggleSocket() {
 
         console.log('Toggle Socket hit')
         this.setState(state => ({
             ...state,
             showSocket: true
+
         }));
 
+        if (!this.state.lineSubscribed) {
+
+            this.subscribeLine()
+        }
+        
         clearInterval(this.timer);
+
+        this.keepAliveTimer = setInterval(
+            () => this.checkForFrames(), 35000
+        );
+
     }
 
     componentDidMount() {
@@ -265,14 +200,8 @@ class WebSock extends React.PureComponent {
         );
     };
 
-    
   
     render() {
-
-        var list = this.state.frames.map((item) =>
-
-            <li key={item.toString()}>{item}</li>
-        );
 
         var url = localStorage.getItem('ws');
 
@@ -281,13 +210,8 @@ class WebSock extends React.PureComponent {
             return (
                 
                 <div className='callpop'>
-                    <Websocket url={url} onMessage={this.handleData.bind(this)}/>
-                    Number of keepalives received: {this.state.keepalivesCount}
-                    <div>
-                        <button title='Reconnect Socket' className='reconnect' onClick={() => this.reconnect()} type='button'>Reconnect Socket</button>
-                    </div>
-                    <CallPop ref={popref => {this.popref = popref}} callData = {list} clearPop = {this.clearFrames} callEnded = {this.state.callEnded}/>
-                    <MessageParser></MessageParser>
+                    <Websocket url={url} onMessage={this.handleData.bind(this)} />
+                    <MessageParser ref={mpref => {this.mpref = mpref}} newMessage={this.state.currentMessage} socketopen = {this.state.showSocket}/>
                 </div>        
             )
         }
