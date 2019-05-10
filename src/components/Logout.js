@@ -8,6 +8,11 @@ class Logout extends React.Component {
         console.log('Logout hit')
         localStorage.clear();
         this.props.toggleLogin();
+        if (this.props.socketOpen){
+
+            this.props.toggleSocket();
+        }
+        
     };
   
   

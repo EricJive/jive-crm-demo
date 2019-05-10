@@ -18,8 +18,6 @@ class Counter extends React.Component {
 
     setTimer(){
 
-        console.log('setTimer hit');
-
         this.setState({counterActive: true});
 
         this.interval = setInterval(
@@ -29,6 +27,7 @@ class Counter extends React.Component {
     }
 
     toHHMMSS(secs) {
+
         var sec_num = parseInt(secs, 10)    
         var hours   = Math.floor(sec_num / 3600) % 24
         var minutes = Math.floor(sec_num / 60) % 60
@@ -40,7 +39,7 @@ class Counter extends React.Component {
     }
 
     incrementTime() {
-        console.log('Increment running');
+        
         this.setState({timer: this.state.timer + 1});
         if(this.props.callEnded) {
             this.stopTimer();
@@ -59,7 +58,6 @@ class Counter extends React.Component {
 
     componentDidMount(){
 
-        console.log('Counter component mounted');
         this.setTimer();
     }
 

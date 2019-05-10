@@ -25,6 +25,7 @@ class Main extends Component {
         };
 
         this.toggleLogin = this.toggleLogin.bind(this);
+        this.toggleSocket =  this.toggleSocket.bind(this);
     };
 
     toggleLogin() {
@@ -39,7 +40,22 @@ class Main extends Component {
 
     }
 
+    componentWillMount() {
+
+        if (localStorage.getItem('token')) {
+            this.setState({loggedIn: true});
+        }
+    }
+
     render() {
+
+        let footer;
+
+        if (this.state.loggedIn) {
+            footer = <footer className='websocket'>
+                        <WebSock toggleSocket={this.toggleSocket} socketOpen={this.state.socketOpen}></WebSock>
+                    </footer>
+        }
 
         return (
             <div className="App">
@@ -60,7 +76,7 @@ class Main extends Component {
                         <Route exact path='/contacts' component={AllContacts}/> 
                         <Route 
                             exact path='/settings' 
-                            render={(props) => <Settings {...props} isLoggedIn = {this.state.loggedIn}/>}
+                            render={(props) => <Settings {...props} isLoggedIn = {this.state.loggedIn} toggleLogin = {this.toggleLogin}/>}
                         />
                         <Route 
                             exact path='/login' 
@@ -69,7 +85,7 @@ class Main extends Component {
                         <Route path='/contact/:number' component={Contact}/>
                         <Route 
                             path='/logout' 
-                            render={(props) => <Logout {...props} toggleLogin = {this.toggleLogin}/>}
+                            render={(props) => <Logout {...props} toggleLogin = {this.toggleLogin} toggleSocket = {this.toggleSocket} socketOpen={this.state.socketOpen}/>}
                         />
                         <Route 
                             path='/jiveauth.php' 
@@ -77,9 +93,7 @@ class Main extends Component {
                         /> 
                     </Switch> 
                 </div>
-                <footer className='websocket'>
-                    <WebSock></WebSock>
-                </footer>
+                {footer}
             </div>
         );
     }

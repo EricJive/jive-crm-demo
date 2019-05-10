@@ -39,22 +39,75 @@ class ClickToCall extends React.Component {
 
     };
 
+    validateDialString(dialstring) {
+
+      var phonenoUS = /^(\([0-9]{3}\)|[0-9]{3})\s?-?[0-9]{3}\s?-?[0-9]{4}\b/;
+
+      var ext = /^\+?[0-9]{3,15}$/;
+
+
+      if(dialstring.match(phonenoUS)) {
+
+        return true;
+
+      }  
+
+      else if (dialstring.match(ext)) {
+
+        return true;
+      }
+
+      else {
+
+        return false;
+      }
+    }
+
     
   
     render(){
 
       let button;
 
-      if (localStorage.getItem('selectedLine') && localStorage.getItem('token')) {
-        button = <button title='Click to Call' className='call' onClick={() => this.sendCall(this.props.dialString)} type='button'></button> ;
+      if (this.props.fromCallBox) {
+
+
+        if (localStorage.getItem('selectedLine') && localStorage.getItem('token')) {
+
+          if (this.validateDialString(this.props.dialString)){
+  
+            button = <button title='Click to Call' className='call' onClick={() => this.sendCall(this.props.dialString)} type='button'></button> ;
+          }
+  
+          else {
+  
+            button = <button className='nocall'type='button' title='Invalid DialString'></button> ;
+          }
+          
+        }
+  
+        else {
+          button = <button className='nocall'type='button' title='Calling Disabled, Check Settings'></button> ;
+        }
+
       }
 
       else {
-        button = <button className='nocall'type='button' title='Calling Disabled, Check Settings'></button> ;
-      }
 
-      return (
-           <div className='callbtn'>{button}</div>
+        if (localStorage.getItem('selectedLine') && localStorage.getItem('token')) {
+
+          button = <button title='Click to Call' className='call' onClick={() => this.sendCall(this.props.dialString)} type='button'></button> ;
+          
+        }
+  
+        else {
+          button = <button className='nocall'type='button' title='Calling Disabled, Check Settings'></button> ;
+        }
+    }
+
+    return (
+      <div className='callbtn'>{button}</div>
+    
       )
     }
   

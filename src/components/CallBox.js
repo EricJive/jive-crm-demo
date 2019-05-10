@@ -7,21 +7,33 @@ class CallBox extends React.Component {
         super(props);
 
         this.state ={
-            dialString : 0
+            dialString : 'none'
         }
 
     };
 
     updateInputValue(evt) {
 
-        this.setState({
-            dialString: evt.target.value
-        })
-    }
-  
-  
-    render(){
+        if (evt.target.value === ''){
+
+            this.setState({
+                dialString: 'none'
+            })
+
+        }
+
+        else {
+
+            this.setState({
+                dialString: evt.target.value
+            })
+        }
+
         
+    }
+    
+    render(){
+ 
         return (
             <div className='callbox'>
                 <div className='left'>
@@ -34,7 +46,7 @@ class CallBox extends React.Component {
                     ></input>
                 </div>
                 <div className='right'>
-                    <ClickToCall dialString={this.state.dialString}/>
+                    <ClickToCall dialString={this.state.dialString} fromCallBox={true}/>
                 </div>
             </div>
         )

@@ -24,8 +24,6 @@ class CallPop extends React.Component {
     
     chackForCallEnd(){
 
-        console.log('CallPop interval running')
-
         if (this.props.callEnded) {
             this.setState({callComplete: true, callStarted: false})
             clearInterval(this.interval);
@@ -40,7 +38,7 @@ class CallPop extends React.Component {
 
         // Panel is still open, need to clear data or make a new pop
         if (this.state.isPaneOpen){
-            console.log('Pane is open already')
+
             this.setState({isPaneOpen : true}, function() {
                 this.props.clearPop();
             })
@@ -69,8 +67,6 @@ class CallPop extends React.Component {
     }
 
     render() {
-
-        console.log('Call pop rendered and calldata:' + this.props.callData)
 
         return (
             <div ref={ref => this.el = ref}>

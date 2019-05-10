@@ -181,41 +181,44 @@ class MessageParser extends React.PureComponent {
 
         //Keep alive
         else {
-            this.setState(
-                {keepalivesCount: this.state.keepalivesCount + 1}
-            );
+
+            if(this.state.keepalivesCount > 100) {
+
+                this.setState(
+                    {keepalivesCount: 0}
+                );
+            }
+            else {
+
+                this.setState(
+                    {keepalivesCount: this.state.keepalivesCount + 1}
+                );
+            }
+            
         }
         
     }
 
-    componentDidMount() {
-
-        console.log('MessageParser Component Moutned');
-    };
-
-  
     render() {
-
-        console.log('MessageParser rendered');
 
         var list = this.state.frames.map((item) =>
 
             <li key={item.toString()}>{item}</li>
         );
 
-        if (this.props.socketopen){ 
+        if (this.props.socketopen && localStorage.getItem('ws')){ 
 
             return (
                 
                 <div className='callpop'>
-                    Number of keepalives received: {this.state.keepalivesCount}
+                    Socket Status: Connected
                     <CallPop ref={popref => {this.popref = popref}} callData = {list} clearPop = {this.clearFrames} callEnded = {this.state.callEnded}/>
                 </div>        
             )
         }
 
         else {
-            return <span></span>
+            return <p>Socket Status: Not Connected</p>
         }
 
         

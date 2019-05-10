@@ -45,6 +45,8 @@ class Settings extends React.Component {
     //If token exists, but we have not gotten the lines yet > get user info
     if ( localStorage.getItem('token') && !localStorage.getItem('lines')){
 
+      this.props.toggleLogin();
+
       console.log('Getting user info...');
   
       this.getLineInfo().then(response => {

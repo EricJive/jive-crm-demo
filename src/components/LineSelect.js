@@ -46,15 +46,13 @@ class LineSelect extends React.Component {
             ]
         )
 
-        
-
         axios.post(url,reqBody,{headers: headers})
         .then(response => { 
             console.log(response.data)
-          })
+        })
         .catch(error => {
             console.log(error);
-            alert("An error occurred, Subscription request failed. Please try again later or logout from Jive");
+            //alert("An error occurred, Subscription request failed. Please try again later or logout from Jive");
         });
     }
 
@@ -89,6 +87,7 @@ class LineSelect extends React.Component {
 
         var line = document.getElementById('lineSelect').value;
         var id = document.getElementById('lineSelect').selectedIndex;
+        var url = localStorage.getItem('subscriptions');
 
         localStorage.setItem('selectedLineID', line);
         console.log('LineID changed to ' + line);
@@ -101,7 +100,11 @@ class LineSelect extends React.Component {
         localStorage.setItem('organizationID', organizationID);
         localStorage.setItem('selectedLine', selectedLine);
 
-        this.subscribeLine(line, organizationID);
+        if(url){
+
+            this.subscribeLine(line, organizationID);
+        }
+        
         
     }
 
@@ -152,17 +155,6 @@ class LineSelect extends React.Component {
 
         this.buildOptions();
 
-        if (!localStorage.getItem('subscriptions')){
-
-            this.getSession().then(data =>{
-
-                localStorage.setItem('ws', data.ws);
-                localStorage.setItem('subscriptions', data.subscriptions);
-                localStorage.setItem('session', data.self);
-                console.log('Session info saved');
-    
-            })
-        }
     }
     
     render(){

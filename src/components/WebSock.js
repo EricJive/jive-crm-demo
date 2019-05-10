@@ -11,8 +11,11 @@ class WebSock extends React.PureComponent {
         this.state = {
 
           showSocket: false,
+          socketConnected: false,
           currentMessage: '',
-          lineSubscribed: false
+          lineSubscribed: false,
+          retryCount: 0,
+          url: ''
         };
 
         this.timer = null;
@@ -56,6 +59,18 @@ class WebSock extends React.PureComponent {
                 console.log(response.data);
                 this.setState({lineSubscribed: true})
             })
+            .catch(error => {
+                    console.log(error);
+                    //alert("An error occurred, Subscription request failed. Please try again later or logout from Jive");
+                    if (error.response) {
+        
+                        return error.response;
+                    }
+                    else {
+        
+                        return error;
+                    }
+            })
         }
     }
 
@@ -77,105 +92,124 @@ class WebSock extends React.PureComponent {
           
         .catch(error => {
             console.log(error);
-            alert("An error occurred, Session request failed. Please try again later or logout from Jive");
-            return error.response.status;
-        });
-    }
+            //alert("An error occurred, Session request failed. Please try again later or logout from Jive");
+            if (error.response) {
 
-    checkSubscription() {
+                return error.response;
+            }
+            else {
 
-        console.log('Checking subscription info...');
-
-        var token = localStorage.getItem('token');
-
-        var url = localStorage.getItem('session');
-
-        var headers = {
-            "Authorization": "Bearer " + token
-        };
-
-        return axios.get(url,{headers: headers})
-        .then(response => { 
-            console.log(response)
-            return response.data;
-          })
-          
-        .catch(error => {
-            console.log(error);
-            alert("An error occurred, Session info request failed. Please try again later or logout from Jive");
-            return error.response.status;
+                return error;
+            }
         });
     }
 
     handleData(data) {
 
-        // Stop 30 second timer when frame comes in
-
+        // Stop 60 second timer when frame comes in
         clearInterval(this.keepAliveTimer);
 
-        this.setState({currentMessage: data}, function (){
+        this.setState({currentMessage: data, socketConnected: true}, function (){
             this.mpref.handleData();
 
-            //start 30 second timerAGAIN after getting frame from socket
-            console.log('Timer reset');
+            //start 60 second timer AGAIN after getting last frame from socket
             this.keepAliveTimer = setInterval(
-                () => this.checkForFrames(), 35000
+                () => this.checkForFrames(), 60000
             );
-            
         });
     }
 
-    reconnect() {
 
-        console.log('Reconnect function called');
+    connectSocket() {
+
+        console.log('Attempting to connect to websocket...');
 
         //Clear the current subscription info
         localStorage.removeItem('ws');
-        localStorage.removeItem('subscrtiptions');
+        localStorage.removeItem('subscriptions');
+        localStorage.removeItem('session');
 
-        //this.checkSubscription().then(response => {
+        //Create new session (if line selected)
+        if(localStorage.getItem('selectedLineID')) {
 
-          //  console.log(response.activeSubscriptions);
-        //});
+            this.getSession().then(data =>{
 
-        //Create new session
-        this.getSession().then(data =>{
+                if(data.ws) {
+    
+                    localStorage.setItem('ws', data.ws);
+                    localStorage.setItem('subscriptions', data.subscriptions);
+                    localStorage.setItem('session', data.self);
+                    console.log('Session info saved on reconnect');
+    
+                    this.setState({socketConnected: true, showSocket: true, url: data.ws}, function () {
 
-            localStorage.setItem('ws', data.ws);
-            localStorage.setItem('subscriptions', data.subscriptions);
-            localStorage.setItem('session', data.self);
-            console.log('Session info saved');
+                        //Create new subscription
+                        this.subscribeLine();
 
-        })
+                        this.props.toggleSocket();
+                        
+                    });
+                }
+            })
+        }
 
-        //Create new subscription
-        this.subscribeLine();
+        else {
 
+            console.log('No line selected, unable to connect to socket');
+        }
+        
     }
   
     checkForWS(){
 
-        console.log('Check websocket hit');
+        var ws = localStorage.getItem('ws');
+        var line = localStorage.getItem('selectedLineID');
 
-        if (localStorage.getItem('ws')){
+        // Check for line select
+        if (line && !ws){
+
+            this.connectSocket();
+
             this.toggleSocket();
         }
+
+        // If line is selecetd and ws has an address
+        if(line && ws) {
+
+            this.toggleSocket();
+        }
+
+        this.setState({retryCount: this.state.retryCount + 1}, function(){
+
+            if (this.state.retryCount === 10) {
+                this.setState({retryCount: 0}, function (){
+
+                    this.connectSocket();
+                });
+            }
+        })
     }
 
     checkForFrames() {
 
-        console.log('No frames for 35 seconds, requesting new session');
-        this.reconnect()
+        console.log('No frames for 60 seconds, requesting new session');
+        this.setState({socketConnected: false, showSocket: false, url: ''}, function() {
 
+            this.props.toggleSocket();
+
+            if(localStorage.getItem('token')){
+
+                this.connectSocket();
+            }
+        })
     }
 
     toggleSocket() {
 
-        console.log('Toggle Socket hit')
+
         this.setState(state => ({
             ...state,
-            showSocket: true
-
+            retryCount: 0,
         }));
 
         if (!this.state.lineSubscribed) {
@@ -186,14 +220,11 @@ class WebSock extends React.PureComponent {
         clearInterval(this.timer);
 
         this.keepAliveTimer = setInterval(
-            () => this.checkForFrames(), 35000
+            () => this.checkForFrames(), 60000
         );
-
     }
 
     componentDidMount() {
-
-        console.log('WebSocket Component Moutned');
 
         this.timer = setInterval(
             () => this.checkForWS(), 5000
@@ -203,24 +234,28 @@ class WebSock extends React.PureComponent {
   
     render() {
 
-        var url = localStorage.getItem('ws');
-
-        if (url){ 
+        if (this.props.socketOpen && this.state.url) { 
 
             return (
                 
                 <div className='callpop'>
-                    <Websocket url={url} onMessage={this.handleData.bind(this)} />
+                    <Websocket url={this.state.url} onMessage={this.handleData.bind(this)} />
                     <MessageParser ref={mpref => {this.mpref = mpref}} newMessage={this.state.currentMessage} socketopen = {this.state.showSocket}/>
                 </div>        
             )
         }
 
         else {
-            return <span></span>
-        }
 
-        
+            if(localStorage.getItem('token') && localStorage.getItem('selectedLineID')){
+
+                return <p>Trying to connect socket...</p>
+            } 
+
+            else {
+                return <span></span>
+            }
+        }
     };
 }
 
