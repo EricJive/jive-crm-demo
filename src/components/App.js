@@ -5,11 +5,9 @@ import '../App.css';
 
 const App = () => (
 
-  <div>
+  <div className='mainapp'>
     <Main />
   </div>
 )
-
-  
 
 export default App;

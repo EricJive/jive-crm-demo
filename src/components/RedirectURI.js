@@ -1,13 +1,12 @@
 import React from 'react';
 
-class TestWindow extends React.PureComponent {
+class RedirectURI extends React.PureComponent {
 
   
     componentDidMount() {
-        console.log('/Test endpoint hit and isLoggedIn =  '+ this.props.isLoggedIn);
 
         if (this.props.isLoggedIn === false) {
-            //Parse out the token
+
             var parameter = this.props.location.hash;
             var stringArray = [];
             var token = '';
@@ -20,22 +19,18 @@ class TestWindow extends React.PureComponent {
             localStorage.setItem("token", token);
             localStorage.setItem('username', username);
             this.props.toggleLogin();
-            console.log("Toggle Login Hit by TestWindow")
         }
 
     };
   
-    componentWillUnmount() {
-
-    };
-  
     render() {
+        
         return (
             <div className='test'>
                 <p>We have received our token successfully!</p>
-                <p>Click on Settings to continue...</p>
-            </div>        )
+            </div>        
+        )
     };
 }
 
-export default TestWindow;
+export default RedirectURI;

@@ -9,16 +9,20 @@ const Contact = (props) => {
     );
 
     if (!contact) {
-        return <div>Sorry, but no contact was not found</div>
+        return <div className='contact'>Sorry, but no contact was not found</div>
     }
 
     return (
         <div className='contact'>
             <h3>Contact Info</h3>
             <p>{contact.firstname} {contact.lastname}</p>  
-            <p>{contact.phone} </p>
-            <div className="clicktocall">
-                <ClickToCall className="clicktocall2" dialString={contact.phone}/>
+            <div className="callbox">
+                <div className='left'>
+                    {contact.phone}
+                </div>
+                <div className='right'>
+                    <ClickToCall dialString={contact.phone}/>
+                </div>
             </div>
         </div>
     )  

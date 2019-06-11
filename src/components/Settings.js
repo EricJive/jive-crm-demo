@@ -7,10 +7,12 @@ class Settings extends React.Component {
 
   
   constructor(props){
+
     super(props);
     this.token = localStorage.getItem('token');
     this.username = localStorage.getItem('username');
     this.userInfo = '';
+    this.organization = '';
 
     this.state = {
       showLineSelect : false
@@ -25,37 +27,52 @@ class Settings extends React.Component {
     };
 
     return axios.get('https://api.jive.com/users/v1/users/' + this.username +'/lines',{headers: headers})
-      .then(function (response) {
+      .then(response => { 
         return response.data;
+      })
+      
+      .catch(error => {
+          alert("An error occurred, Request for Line Info failed. Please login to Jive again.");
+          localStorage.clear();
+          return error.response.status;
       });
 
   }
 
 
   componentWillMount() {
-    //TODO
-    //Get the users line information and add to the dropdown list
 
-    //Check for token
-    console.log('Settings Compenent Mounted');
-
-    //If token exists, get user info
+    //If token exists, but we have not gotten the lines yet > get user info
     if ( localStorage.getItem('token') && !localStorage.getItem('lines')){
 
-      console.log('Getting user info...')
+      this.props.toggleLogin();
+
+      console.log('Getting user info...');
   
-      this.getLineInfo().then(data =>{
+      this.getLineInfo().then(response => {
 
-        //console.log(data);
-        localStorage.setItem('lines', JSON.stringify(data));
+        if(response !== 401){
 
-        //Get first line automatically
-        this.userInfo = data.items[0].id;
-        localStorage.setItem('selectedLine', this.userInfo);
-        console.log(this.userInfo);
-        this.setState({showLineSelect: true});
-      })
+          localStorage.setItem('lines', JSON.stringify(response));
 
+          //If we only have one line
+          if (response.items.length === 1) {
+  
+            //Set first line automatically if it is the only one
+            this.userInfo = response.items[0].id;
+            this.organization = response.items[0].organization.id;
+            localStorage.setItem('selectedLineID', this.userInfo);
+            localStorage.setItem('organizationID', this.organization);
+            localStorage.setItem('selectedLine', response.items[0].number);
+          } 
+          this.setState({showLineSelect: true});
+        }
+
+        else {
+          this.setState({showLineSelect: false});
+        }
+
+      });
     }
 
     if (localStorage.getItem('lines')) {
@@ -67,7 +84,6 @@ class Settings extends React.Component {
   render() {
 
     let lineSelector;
-    console.log('Show line select is: ' + this.state.showLineSelect);
 
     if (this.state.showLineSelect) {
 
@@ -78,18 +94,13 @@ class Settings extends React.Component {
       lineSelector = <p>Loading...</p>
     }
 
-    console.log('Settings Render called');
-
     if (localStorage.getItem('token')) {
 
-      console.log('Logged In was true')
       return ( 
         
         <div className="settings">
           <p>Jive Settings</p> 
-          <p>Choose your extension:</p>
           {lineSelector}
-          <br></br>
           <br></br>
           <Link to='/logout'>Logout</Link>
         </div>
@@ -97,7 +108,7 @@ class Settings extends React.Component {
     }
 
     else {
-      console.log('Logged In was false')
+
       return (
         <div className="settings">
           <Link to='/login'>Login to Jive</Link>

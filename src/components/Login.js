@@ -8,35 +8,47 @@ class Login extends React.Component {
         super(props);
 
         this.state = {
-            showWindowPortal: false
+            showWindowPortal: true
         };
 
         this.toggleWindowPortal = this.toggleWindowPortal.bind(this);
+
+        this.timerID = null;
     };
 
+    checkForLogin(){
 
-    componentDidMount() {
+        console.log('Check login hit');
 
-        console.log('Login Did Mount and main Login state is ');
-
-        if (this.props.isLoggedIn){
+        if (localStorage.getItem('token')){
             this.toggleWindowPortal();
         }
     }
 
+
+    componentDidMount() {
+
+        this.timerID = setInterval(
+            () => this.checkForLogin(), 2000
+        );
+    }
+
+    componentWillUnmount(){
+
+        clearInterval(this.timerID);
+    }
+
     toggleWindowPortal() {
-        console.log('Toggle Window hit')
+
         this.setState(state => ({
             ...state,
-            showWindowPortal: !state.showWindowPortal,
+            showWindowPortal: false
         }));
     }
     
     render(){
 
-        console.log('Login render method called');
-
-        if (localStorage.getItem('token')) {
+        if (!this.state.showWindowPortal) {
 
             console.log('Login Redirecting to settings...')
             return <Redirect to='/settings' />
@@ -44,8 +56,10 @@ class Login extends React.Component {
 
         else {
             console.log("Login Portal rendered...");
+            localStorage.clear();
             return (
                 <div className='login'>
+                    <p>Logging in...</p>
                     <div className='test'>
                         <MyWindowPortal></MyWindowPortal>
                     </div>

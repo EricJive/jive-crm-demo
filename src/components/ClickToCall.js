@@ -3,17 +3,9 @@ import axios from 'axios';
 
 
 class ClickToCall extends React.Component {
-
-    constructor(props){
-      super(props);
-      console.log('Click to call props ' + props);
-      
-    };
-  
-  
+ 
     sendCall(number) {
   
-      console.log("Call button pressed");
       console.log('Attempting to call ' + number);
 
       var token = localStorage.getItem('token');
@@ -24,9 +16,8 @@ class ClickToCall extends React.Component {
             "Authorization": "Bearer " + token
       };
 
-      var line = localStorage.getItem('selectedLine');
+      var line = localStorage.getItem('selectedLineID');
 
-      //TODO get Line from settings
       var reqBody = JSON.stringify(
         {
             dialString : number,
@@ -37,9 +28,40 @@ class ClickToCall extends React.Component {
       )
 
       axios.post('https://api.jive.com/calls/v2/calls',reqBody,{headers: headers})
-      .then(response => console.log(response));
+      .then(response => { 
+        console.log(response)
+      })
+      
+      .catch(error => {
+          console.log(error);
+          alert("An error occurred, Call request failed. Please try again later or logout from Jive");
+      });
 
     };
+
+    validateDialString(dialstring) {
+
+      var phonenoUS = /^(\([0-9]{3}\)|[0-9]{3})\s?-?[0-9]{3}\s?-?[0-9]{4}\b/;
+
+      var ext = /^\+?[0-9]{3,15}$/;
+
+
+      if(dialstring.match(phonenoUS)) {
+
+        return true;
+
+      }  
+
+      else if (dialstring.match(ext)) {
+
+        return true;
+      }
+
+      else {
+
+        return false;
+      }
+    }
 
     
   
@@ -47,23 +69,48 @@ class ClickToCall extends React.Component {
 
       let button;
 
-      if (localStorage.getItem('token')) {
-        button = <button title='Click to Call' className='call' onClick={() => this.sendCall(this.props.dialString)} type='button'></button> ;
+      if (this.props.fromCallBox) {
+
+
+        if (localStorage.getItem('selectedLine') && localStorage.getItem('token')) {
+
+          if (this.validateDialString(this.props.dialString)){
+  
+            button = <button title='Click to Call' className='call' onClick={() => this.sendCall(this.props.dialString)} type='button'></button> ;
+          }
+  
+          else {
+  
+            button = <button className='nocall'type='button' title='Invalid DialString'></button> ;
+          }
+          
+        }
+  
+        else {
+          button = <button className='nocall'type='button' title='Calling Disabled, Check Settings'></button> ;
+        }
+
       }
 
       else {
-        button = <button className='nocall'type='button'></button> ;
-      }
 
-      console.log("Call Component Rendered");
+        if (localStorage.getItem('selectedLine') && localStorage.getItem('token')) {
 
-      return (
-           <div title='Calling Disabled' className="callbtn">{button}</div> 
+          button = <button title='Click to Call' className='call' onClick={() => this.sendCall(this.props.dialString)} type='button'></button> ;
+          
+        }
+  
+        else {
+          button = <button className='nocall'type='button' title='Calling Disabled, Check Settings'></button> ;
+        }
+    }
+
+    return (
+      <div className='callbtn'>{button}</div>
+    
       )
     }
   
   };
   
-  
-
   export default ClickToCall;
