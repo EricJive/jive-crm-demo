@@ -12,6 +12,7 @@ import Logout from './Logout';
 import Login from './Login';
 import WebSock from './WebSock';
 import CallBox from './CallBox';
+import CallReports from './CallReports';
 
 class Main extends Component {
 
@@ -48,6 +49,10 @@ class Main extends Component {
     }
 
     render() {
+
+        //Removed for build 
+        // <div className='divider'/>
+        //<Link to='/reports'>Call Reports</Link>
 
         let footer;
 
@@ -91,6 +96,10 @@ class Main extends Component {
                             path='/jiveauth.php' 
                             render={(props) => <RedirectURI {...props} isLoggedIn = {this.state.loggedIn} toggleLogin = {this.toggleLogin}/>}
                         /> 
+                        <Route 
+                            exact path='/reports' 
+                            render={(props) => <CallReports {...props} isLoggedIn = {this.state.loggedIn} toggleLogin = {this.toggleLogin}/>}
+                        />
                     </Switch> 
                 </div>
                 {footer}

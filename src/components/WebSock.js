@@ -14,7 +14,6 @@ class WebSock extends React.PureComponent {
           socketConnected: false,
           currentMessage: '',
           lineSubscribed: false,
-          retryCount: 0,
           url: ''
         };
 
@@ -114,7 +113,7 @@ class WebSock extends React.PureComponent {
 
             //start 60 second timer AGAIN after getting last frame from socket
             this.keepAliveTimer = setInterval(
-                () => this.checkForFrames(), 60000
+                () => this.websocketError(), 60000
             );
         });
     }
@@ -162,10 +161,12 @@ class WebSock extends React.PureComponent {
   
     checkForWS(){
 
+        console.log('CheckForWS called');
+
         var ws = localStorage.getItem('ws');
         var line = localStorage.getItem('selectedLineID');
 
-        // Check for line select
+        // Check for line select but no websocket
         if (line && !ws){
 
             this.connectSocket();
@@ -174,26 +175,20 @@ class WebSock extends React.PureComponent {
         }
 
         // If line is selecetd and ws has an address
-        if(line && ws) {
+        else if(line && ws) {
 
             this.toggleSocket();
         }
 
-        this.setState({retryCount: this.state.retryCount + 1}, function(){
-
-            if (this.state.retryCount === 10) {
-                this.setState({retryCount: 0}, function (){
-
-                    this.connectSocket();
-                });
-            }
-        })
+        else {
+            console.log('No line selected');
+        }
     }
 
-    checkForFrames() {
+    websocketError() {
 
         console.log('No frames for 60 seconds, requesting new session');
-        this.setState({socketConnected: false, showSocket: false, url: ''}, function() {
+        this.setState({socketConnected: false, showSocket: false, url: '', lineSubscribed: false}, function() {
 
             this.props.toggleSocket();
 
@@ -206,10 +201,13 @@ class WebSock extends React.PureComponent {
 
     toggleSocket() {
 
+        console.log("Toggle Socket called");
 
         this.setState(state => ({
-            ...state,
+            showSocket: true,
             retryCount: 0,
+            socketConnected: true
+
         }));
 
         if (!this.state.lineSubscribed) {
@@ -219,8 +217,11 @@ class WebSock extends React.PureComponent {
         
         clearInterval(this.timer);
 
+        this.props.toggleSocket();
+
         this.keepAliveTimer = setInterval(
-            () => this.checkForFrames(), 60000
+            //Checking for keep alives
+            () => this.websocketError(), 60000
         );
     }
 
@@ -229,8 +230,23 @@ class WebSock extends React.PureComponent {
         this.timer = setInterval(
             () => this.checkForWS(), 5000
         );
+
+        if(localStorage.getItem('ws')){
+            this.setState({url: localStorage.getItem('ws')});
+        }
     };
 
+    componentWillUnmount(){
+
+        console.log('WebSock will unmount called')
+        if(this.timer) {
+            clearInterval(this.timer)
+        }
+
+        if (this.keepAliveTimer) {
+            clearInterval(this.keepAliveTimer)
+        }
+    }
   
     render() {
 
